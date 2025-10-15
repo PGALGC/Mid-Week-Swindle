@@ -3840,7 +3840,7 @@ Example:
                 return playerWeekData && parseFloat(playerWeekData.invested) === 5.0;
             });
             
-            // Sort players by score (highest first for Stableford)
+            // Sort players by Results table priority (1st, 2nd, 3rd, 4th), then by highest to lowest scores
             const playersWithScores = fivePoundPlayers.map(player => {
                 const weekData = player.weeks[currentVisibleWeekIndex];
                 return {
@@ -3852,7 +3852,23 @@ Example:
                     prize: weekData.prize ? parseFloat(weekData.prize) : 0,
                     invested: weekData.invested ? parseFloat(weekData.invested) : 0
                 };
-            }).sort((a, b) => b.score - a.score);
+            }).sort((a, b) => {
+                // Get results table positions for priority ordering
+                const results = trackerData.results || {};
+                const aResultsPosition = getResultsPosition(a.name, results);
+                const bResultsPosition = getResultsPosition(b.name, results);
+                
+                // If both players have results positions, sort by results priority
+                if (aResultsPosition !== null && bResultsPosition !== null) {
+                    return aResultsPosition - bResultsPosition; // Lower position number = higher priority
+                }
+                // If only one has a results position, prioritize that one
+                if (aResultsPosition !== null) return -1;
+                if (bResultsPosition !== null) return 1;
+                
+                // If neither has a results position, sort by score descending (highest first)
+                return b.score - a.score;
+            });
             
             // Calculate dimensions
             const width = 500;
