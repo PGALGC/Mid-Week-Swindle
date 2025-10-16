@@ -6860,19 +6860,21 @@ Example:
             input.type = 'number';
             input.className = 'inline-score-input';
             input.value = currentScore || '';
-            input.min = '1';
+            input.min = '0';
             input.max = '12';
             input.style.cssText = `
-                width: 20px;
-                height: 20px;
+                width: 24px;
+                height: 24px;
                 border: none;
                 background: transparent;
                 text-align: center;
-                font-size: 10px;
+                font-size: 11px;
                 font-weight: bold;
                 color: black;
                 border-radius: 50%;
                 outline: 2px solid var(--color-accent-primary);
+                padding: 0;
+                line-height: 1;
             `;
             
             // Replace circle content with input
@@ -6891,8 +6893,8 @@ Example:
                 const newValue = input.value.trim();
                 let scoreValue = newValue === '' ? '' : parseInt(newValue);
                 
-                // Validate score
-                if (scoreValue !== '' && (isNaN(scoreValue) || scoreValue < 1 || scoreValue > 12)) {
+                // Validate score (allow 0 as a valid score)
+                if (scoreValue !== '' && (isNaN(scoreValue) || scoreValue < 0 || scoreValue > 12)) {
                     // Invalid score, revert to original
                     circleElement.textContent = originalContent;
                     return;
@@ -6930,9 +6932,11 @@ Example:
         
         // Calculate Stableford points
         function calculateStablefordPoints(grossScore, par, playerPHC, holeIndex) {
-            if (!grossScore || grossScore === '') return 0;
+            if (grossScore === '' || grossScore === null || grossScore === undefined) return 0;
             
             const gross = parseInt(grossScore);
+            if (isNaN(gross)) return 0;
+            
             const shots = playerPHC >= holeIndex ? 1 : 0; // Player gets a shot if PHC >= hole index
             const netScore = gross - shots;
             const scoreToPar = netScore - par;
@@ -7092,8 +7096,8 @@ Example:
                     
                     html += `<td>
                         <div class="score-container">
-                            <input type="number" class="gross-score-input" value="${score}" onchange="updatePlayerScore(${playerIndex}, ${i}, this.value)" min="1" max="12" placeholder="" style="display: none;">
-                            <div class="gross-score-display ${score === '' ? 'empty' : ''}" onclick="editGrossScore(${playerIndex}, ${i}, this)">${score === '' ? '-' : score}</div>
+                            <input type="number" class="gross-score-input" value="${score}" onchange="updatePlayerScore(${playerIndex}, ${i}, this.value)" min="0" max="12" placeholder="" style="display: none;">
+                            <div class="gross-score-display ${(score === '' || score === null || score === undefined) ? 'empty' : ''}" onclick="editGrossScore(${playerIndex}, ${i}, this)">${(score === '' || score === null || score === undefined) ? '-' : score}</div>
                             <div class="stableford-display ${stablefordClass}">${score === '' ? 'NR' : stablefordPoints}</div>
                         </div>
                     </td>`;
@@ -7119,8 +7123,8 @@ Example:
                     
                     html += `<td>
                         <div class="score-container">
-                            <input type="number" class="gross-score-input" value="${score}" onchange="updatePlayerScore(${playerIndex}, ${i}, this.value)" min="1" max="12" placeholder="" style="display: none;">
-                            <div class="gross-score-display ${score === '' ? 'empty' : ''}" onclick="editGrossScore(${playerIndex}, ${i}, this)">${score === '' ? '-' : score}</div>
+                            <input type="number" class="gross-score-input" value="${score}" onchange="updatePlayerScore(${playerIndex}, ${i}, this.value)" min="0" max="12" placeholder="" style="display: none;">
+                            <div class="gross-score-display ${(score === '' || score === null || score === undefined) ? 'empty' : ''}" onclick="editGrossScore(${playerIndex}, ${i}, this)">${(score === '' || score === null || score === undefined) ? '-' : score}</div>
                             <div class="stableford-display ${stablefordClass}">${score === '' ? 'NR' : stablefordPoints}</div>
                         </div>
                     </td>`;
@@ -7499,14 +7503,15 @@ Example:
             });
         }
         
-        // Clear all scores
+        // Clear all scores (player scores only, preserve PAR and INDEX)
         function clearAllScores() {
-            if (confirm('Are you sure you want to clear all scores?')) {
+            if (confirm('Are you sure you want to clear all player scores? (PAR and INDEX will remain unchanged)')) {
                 scorecardData.players.forEach(player => {
                     player.scores = new Array(18).fill('');
                 });
                 autoSaveScorecardData(); // Auto-save
                 buildScorecardTable();
+                showStatusMessage('Player scores cleared successfully', 'success');
             }
         }
         
