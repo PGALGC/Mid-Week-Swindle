@@ -3505,6 +3505,9 @@ Example:
         }
         
         function generatePHCCanvasCapture() {
+            // Get current theme colors
+            const themeColors = getCurrentThemeColors();
+            
             // Sort players alphabetically by name
             const sortedPlayers = trackerData.players.slice().sort((a, b) => a.name.localeCompare(b.name));
             
@@ -3548,20 +3551,20 @@ Example:
             ctx.textRenderingOptimization = 'optimizeQuality';
             
             // Background
-            ctx.fillStyle = '#2d3748';
+            ctx.fillStyle = themeColors.bgContainer;
             ctx.fillRect(0, 0, width, height);
             
             // Header with improved font rendering
-            ctx.fillStyle = '#4299e1';
+            ctx.fillStyle = themeColors.accentPrimary;
             ctx.font = 'bold 22px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif';
             ctx.textAlign = 'center';
             ctx.fillText('🏆 Mid-Week Golf Swindle', width / 2, 28);
             
-            ctx.fillStyle = '#4299e1';
+            ctx.fillStyle = themeColors.accentPrimary;
             ctx.font = 'bold 18px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif';
             ctx.fillText('📋 Players PHC & Financial Summary', width / 2, 50);
             
-            ctx.fillStyle = '#a0aec0';
+            ctx.fillStyle = themeColors.textSecondary;
             ctx.font = '14px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif';
             ctx.fillText(`${playersWithTotals.length} Players (Alphabetical Order)`, width / 2, 70);
             
@@ -3579,16 +3582,16 @@ Example:
                 const netAmount = player.prizeTotal - player.investedTotal;
                 
                 // Card background
-                ctx.fillStyle = '#2d3748';
+                ctx.fillStyle = themeColors.bgSecondary;
                 ctx.fillRect(x, y, cardWidth, cardHeight - 10);
                 
                 // Card border
-                ctx.strokeStyle = '#4a5568';
+                ctx.strokeStyle = themeColors.border;
                 ctx.lineWidth = 1;
                 ctx.strokeRect(x, y, cardWidth, cardHeight - 10);
                 
                 // Player number circle
-                ctx.fillStyle = '#4299e1';
+                ctx.fillStyle = themeColors.accentPrimary;
                 ctx.beginPath();
                 ctx.arc(x + 15, y + 15, 10, 0, 2 * Math.PI);
                 ctx.fill();
@@ -3599,13 +3602,13 @@ Example:
                 ctx.fillText((index + 1).toString(), x + 15, y + 20);
                 
                 // PHC in top right
-                ctx.fillStyle = '#4299e1';
+                ctx.fillStyle = themeColors.accentPrimary;
                 ctx.font = 'bold 11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif';
                 ctx.textAlign = 'right';
                 ctx.fillText(`PHC: ${player.phc || 'N/A'}`, x + cardWidth - 10, y + 20);
                 
                 // Player name
-                ctx.fillStyle = '#edf2f7';
+                ctx.fillStyle = themeColors.textPrimary;
                 ctx.font = 'bold 12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif';
                 ctx.textAlign = 'center';
                 ctx.fillText(player.name, x + cardWidth / 2, y + 38);
@@ -3614,7 +3617,7 @@ Example:
                 ctx.fillStyle = 'rgba(255, 87, 34, 0.3)';
                 ctx.fillRect(x + 5, y + 42, (cardWidth - 15) / 2, 18);
                 
-                ctx.fillStyle = '#a0aec0';
+                ctx.fillStyle = themeColors.textSecondary;
                 ctx.font = '9px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif';
                 ctx.textAlign = 'center';
                 ctx.fillText('INVESTED', x + 5 + (cardWidth - 15) / 4, y + 50);
@@ -3627,12 +3630,12 @@ Example:
                 ctx.fillStyle = 'rgba(76, 175, 80, 0.3)';
                 ctx.fillRect(x + 10 + (cardWidth - 15) / 2, y + 42, (cardWidth - 15) / 2, 18);
                 
-                ctx.fillStyle = '#a0aec0';
+                ctx.fillStyle = themeColors.textSecondary;
                 ctx.font = '9px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif';
                 ctx.textAlign = 'center';
                 ctx.fillText('PRIZE WON', x + 10 + (cardWidth - 15) / 2 + (cardWidth - 15) / 4, y + 50);
                 
-                ctx.fillStyle = '#48bb78';
+                ctx.fillStyle = themeColors.success;
                 ctx.font = 'bold 10px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif';
                 ctx.fillText(`£${player.prizeTotal.toFixed(2)}`, x + 10 + (cardWidth - 15) / 2 + (cardWidth - 15) / 4, y + 60);
                 
@@ -3640,12 +3643,12 @@ Example:
                 ctx.fillStyle = 'rgba(66, 153, 225, 0.2)';
                 ctx.fillRect(x + 5, y + 63, cardWidth - 10, 12);
                 
-                ctx.fillStyle = '#a0aec0';
+                ctx.fillStyle = themeColors.textSecondary;
                 ctx.font = '9px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif';
                 ctx.textAlign = 'left';
                 ctx.fillText('Net:', x + 8, y + 73);
                 
-                ctx.fillStyle = netAmount >= 0 ? '#48bb78' : '#ff5722';
+                ctx.fillStyle = netAmount >= 0 ? themeColors.success : '#ff5722';
                 ctx.font = 'bold 10px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif';
                 ctx.textAlign = 'right';
                 ctx.fillText(`£${netAmount.toFixed(2)}`, x + cardWidth - 8, y + 73);
@@ -3653,10 +3656,10 @@ Example:
             
             // Footer
             let footerY = startY + (rows * cardHeight) + 10;
-            ctx.fillStyle = '#4a5568';
+            ctx.fillStyle = themeColors.tableHeader;
             ctx.fillRect(10, footerY, width - 20, footerHeight);
             
-            ctx.fillStyle = '#a0aec0';
+            ctx.fillStyle = themeColors.textSecondary;
             ctx.font = '12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif';
             ctx.textAlign = 'center';
             ctx.fillText(`📅 Generated: ${new Date().toLocaleDateString()} • ${new Date().toLocaleTimeString()}`, width / 2, footerY + 22);
@@ -3829,10 +3832,33 @@ Example:
             }, 100);
         }
         
+        // Helper function to get current theme colors from CSS variables
+        function getCurrentThemeColors() {
+            const root = document.documentElement;
+            const computedStyle = getComputedStyle(root);
+            
+            return {
+                bgPrimary: computedStyle.getPropertyValue('--color-bg-primary').trim(),
+                bgSecondary: computedStyle.getPropertyValue('--color-bg-secondary').trim(),
+                bgContainer: computedStyle.getPropertyValue('--color-bg-container').trim(),
+                textPrimary: computedStyle.getPropertyValue('--color-text-primary').trim(),
+                textSecondary: computedStyle.getPropertyValue('--color-text-secondary').trim(),
+                accentPrimary: computedStyle.getPropertyValue('--color-accent-primary').trim(),
+                success: computedStyle.getPropertyValue('--color-success').trim(),
+                tableHeader: computedStyle.getPropertyValue('--color-table-header').trim(),
+                tableRowOdd: computedStyle.getPropertyValue('--color-table-row-odd').trim(),
+                tableRowEven: computedStyle.getPropertyValue('--color-table-row-even').trim(),
+                border: computedStyle.getPropertyValue('--color-border').trim()
+            };
+        }
+        
         function generateCanvasCapture() {
             const weekNumber = currentVisibleWeekIndex + 1;
             const weekData = trackerData.weeks[currentVisibleWeekIndex];
             const dateText = weekData.date ? formatDateForDisplay(weekData.date) : '';
+            
+            // Get current theme colors
+            const themeColors = getCurrentThemeColors();
             
             // Filter players who invested £5 for this week
             const fivePoundPlayers = trackerData.players.filter(player => {
@@ -3892,34 +3918,34 @@ Example:
             ctx.textRenderingOptimization = 'optimizeQuality';
             
             // Background
-            ctx.fillStyle = '#2d3748';
+            ctx.fillStyle = themeColors.bgContainer;
             ctx.fillRect(0, 0, width, height);
             
             // Header with improved font rendering
-            ctx.fillStyle = '#4299e1';
+            ctx.fillStyle = themeColors.accentPrimary;
             ctx.font = 'bold 26px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif';
             ctx.textAlign = 'center';
             ctx.fillText('🏌️‍♀️ Mid-Week Golf Swindle', width / 2, 32);
             
-            ctx.fillStyle = '#a0aec0';
+            ctx.fillStyle = themeColors.textSecondary;
             ctx.font = '18px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif';
             ctx.fillText('Weekly Results', width / 2, 54);
             
-            ctx.fillStyle = '#4299e1';
+            ctx.fillStyle = themeColors.accentPrimary;
             ctx.font = 'bold 22px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif';
             ctx.fillText(`Week ${weekNumber} Results`, width / 2, 78);
             
-            ctx.fillStyle = '#a0aec0';
+            ctx.fillStyle = themeColors.textSecondary;
             ctx.font = '14px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif';
             ctx.fillText(`${dateText ? `Date: ${dateText} • ` : ''}${fivePoundPlayers.length} players invested £5.00`, width / 2, 98);
             
             let y = headerHeight;
             
             // Table header
-            ctx.fillStyle = '#4a5568';
+            ctx.fillStyle = themeColors.tableHeader;
             ctx.fillRect(10, y, width - 20, tableHeaderHeight);
             
-            ctx.fillStyle = '#edf2f7';
+            ctx.fillStyle = themeColors.textPrimary;
             ctx.font = 'bold 14px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif';
             ctx.textAlign = 'center';
             ctx.fillText('Pos', 40, y + 22);
@@ -3942,7 +3968,7 @@ Example:
                                    position === 3 ? '🥉 3rd' : 
                                    `${position}${getOrdinalSuffix(position)}`;
                 
-                const rowBg = index % 2 === 0 ? '#2d3748' : '#242b36';
+                const rowBg = index % 2 === 0 ? themeColors.tableRowOdd : themeColors.tableRowEven;
                 const prizeText = player.prize > 0 ? `£${player.prize.toFixed(2)}` : '—';
                 
                 // Row background
@@ -3950,17 +3976,17 @@ Example:
                 ctx.fillRect(10, y, width - 20, rowHeight);
                 
                 // Row border
-                ctx.strokeStyle = '#4a5568';
+                ctx.strokeStyle = themeColors.border;
                 ctx.lineWidth = 1;
                 ctx.strokeRect(10, y, width - 20, rowHeight);
                 
                 // Text with improved font rendering
-                ctx.fillStyle = '#4299e1';
+                ctx.fillStyle = themeColors.accentPrimary;
                 ctx.font = 'bold 13px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif';
                 ctx.textAlign = 'center';
                 ctx.fillText(positionText, 40, y + 24);
                 
-                ctx.fillStyle = '#edf2f7';
+                ctx.fillStyle = themeColors.textPrimary;
                 ctx.font = 'bold 13px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif';
                 ctx.textAlign = 'left';
                 ctx.fillText(player.name, 70, y + 24);
@@ -3975,12 +4001,12 @@ Example:
                     ctx.fillRect(305, y + 10, 30, 15);
                     ctx.fillStyle = 'white';
                 } else {
-                    ctx.fillStyle = '#edf2f7';
+                    ctx.fillStyle = themeColors.textPrimary;
                 }
                 ctx.font = 'bold 13px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif';
                 ctx.fillText(player.score.toString(), 320, y + 24);
                 
-                ctx.fillStyle = '#48bb78';
+                ctx.fillStyle = themeColors.success;
                 ctx.font = 'bold 13px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif';
                 ctx.textAlign = 'right';
                 ctx.fillText(prizeText, 470, y + 24);
@@ -3993,15 +4019,15 @@ Example:
             const totalPot = fivePoundPlayers.length * 5.00;
             const totalPrizesAwarded = playersWithScores.reduce((sum, player) => sum + player.prize, 0);
             
-            ctx.fillStyle = '#1a202c';
+            ctx.fillStyle = themeColors.bgPrimary;
             ctx.fillRect(10, y, width - 20, summaryHeight);
             
-            ctx.fillStyle = '#4299e1';
+            ctx.fillStyle = themeColors.accentPrimary;
             ctx.font = 'bold 16px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif';
             ctx.textAlign = 'left';
             ctx.fillText('💰 Financial Summary', 20, y + 22);
             
-            ctx.fillStyle = '#edf2f7';
+            ctx.fillStyle = themeColors.textPrimary;
             ctx.font = '14px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif';
             ctx.fillText('Total Pot:', 20, y + 44);
             ctx.textAlign = 'right';
@@ -4009,7 +4035,7 @@ Example:
             
             ctx.textAlign = 'left';
             ctx.fillText('Prizes Awarded:', 20, y + 62);
-            ctx.fillStyle = '#48bb78';
+            ctx.fillStyle = themeColors.success;
             ctx.textAlign = 'right';
             ctx.fillText(`£${totalPrizesAwarded.toFixed(2)}`, width - 30, y + 62);
             
