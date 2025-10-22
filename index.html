@@ -1508,7 +1508,7 @@
             <div class="player-controls">
                 <input type="text" id="playerName" placeholder="Player Name">
                 <input type="text" id="playerPHC" placeholder="PHC" maxlength="10" class="phc-input">
-                <button id="addPlayer">Add Player</button>
+                <button id="addPlayer" onclick="addPlayerFromForm()">Add Player</button>
             </div>
             
             <div class="week-controls">
@@ -4133,6 +4133,9 @@ Example:
             const weekData = trackerData.weeks[currentVisibleWeekIndex];
             const dateText = weekData.date ? formatDateForDisplay(weekData.date) : '';
             
+            // Read current theme colors
+            const themeColors = getCurrentThemeColors();
+            
             // Get all players in the current table display order
             const allPlayers = getCurrentTableOrder();
             
@@ -4159,13 +4162,13 @@ Example:
             ctx.textRenderingOptimization = 'optimizeQuality';
             
             // Background
-            ctx.fillStyle = '#1a202c';
+            ctx.fillStyle = themeColors.bgContainer;
             ctx.fillRect(0, 0, width, height);
             
             let currentY = 20;
             
             // HEADER SECTION
-            drawSummaryHeader(ctx, width, currentY, weekNumber, dateText);
+            drawSummaryHeader(ctx, width, currentY, weekNumber, dateText, themeColors);
             currentY += headerHeight;
             
             // MAIN CONTENT AREA (Players table + Sidebar)
@@ -4173,13 +4176,13 @@ Example:
             const sidebarX = tableWidth + 40; // Position sidebar to the right
             
             // PLAYERS TABLE SECTION (Left side)
-            drawPlayersTableSideBySide(ctx, tableWidth, currentY, allPlayers, weekNumber);
+            drawPlayersTableSideBySide(ctx, tableWidth, currentY, allPlayers, weekNumber, themeColors);
             
             // RESULTS SECTION (Top right)
-            drawResultsSectionSideBySide(ctx, sidebarX, sidebarWidth, currentY);
+            drawResultsSectionSideBySide(ctx, sidebarX, sidebarWidth, currentY, themeColors);
             
             // RULES SECTION (Bottom right)
-            drawRulesSectionSideBySide(ctx, sidebarX, sidebarWidth, currentY + 200);
+            drawRulesSectionSideBySide(ctx, sidebarX, sidebarWidth, currentY + 200, themeColors);
             
             // Download the image
             const link = document.createElement('a');
@@ -4195,40 +4198,40 @@ Example:
             showStatusMessage(`Complete summary downloaded: ${filename}`, 'success');
         }
         
-        function drawSummaryHeader(ctx, width, startY, weekNumber, dateText) {
+        function drawSummaryHeader(ctx, width, startY, weekNumber, dateText, themeColors) {
             // Main title
-            ctx.fillStyle = '#4299e1';
+            ctx.fillStyle = themeColors.accentPrimary;
             ctx.font = 'bold 32px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif';
             ctx.textAlign = 'center';
             ctx.fillText('🏌️ Mid-Week Golf Swindle', width / 2, startY + 35);
             
             // Week info
-            ctx.fillStyle = '#4299e1';
+            ctx.fillStyle = themeColors.accentPrimary;
             ctx.font = 'bold 24px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif';
             ctx.fillText(`Week ${weekNumber} - Complete Summary`, width / 2, startY + 70);
             
             // Date
-            ctx.fillStyle = '#a0aec0';
+            ctx.fillStyle = themeColors.textSecondary;
             ctx.font = '16px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif';
             ctx.fillText(dateText ? `${dateText}` : new Date().toLocaleDateString(), width / 2, startY + 95);
         }
         
-        function drawPlayersTableSideBySide(ctx, tableWidth, startY, players, weekNumber) {
+        function drawPlayersTableSideBySide(ctx, tableWidth, startY, players, weekNumber, themeColors) {
             const tableX = 30;
             const rowHeight = 45;
             const headerHeight = 35;
             
             // Table background
-            ctx.fillStyle = '#2d3748';
+            ctx.fillStyle = themeColors.bgSecondary;
             ctx.fillRect(tableX, startY, tableWidth, (players.length * rowHeight) + headerHeight + 50);
             
             // Table border
-            ctx.strokeStyle = '#4a5568';
+            ctx.strokeStyle = themeColors.border;
             ctx.lineWidth = 2;
             ctx.strokeRect(tableX, startY, tableWidth, (players.length * rowHeight) + headerHeight + 50);
             
             // Section title
-            ctx.fillStyle = '#4299e1';
+            ctx.fillStyle = themeColors.accentPrimary;
             ctx.font = 'bold 20px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif';
             ctx.textAlign = 'left';
             ctx.fillText('📊 All Players Summary', tableX + 20, startY + 25);
@@ -4236,14 +4239,14 @@ Example:
             let y = startY + 40;
             
             // Table headers
-            ctx.fillStyle = '#4a5568';
+            ctx.fillStyle = themeColors.tableHeader;
             ctx.fillRect(tableX + 10, y, tableWidth - 20, headerHeight);
             
             // Adjusted column widths to fit in the narrower space
             const colWidths = [140, 80, 100, 90, 80, 90, 80, 90]; 
             const headers = ['Player Name', 'PHC', 'Total Invested', 'Total Won', 'Week PHC', 'Week Invested', 'Week Score', 'Week Prize'];
             
-            ctx.fillStyle = '#edf2f7';
+            ctx.fillStyle = themeColors.textPrimary;
             ctx.font = 'bold 12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif';
             ctx.textAlign = 'center';
             
@@ -4274,12 +4277,12 @@ Example:
                 });
                 
                 // Row background
-                const rowBg = index % 2 === 0 ? '#242b36' : '#2d3748';
+                const rowBg = index % 2 === 0 ? themeColors.tableRowOdd : themeColors.tableRowEven;
                 ctx.fillStyle = rowBg;
                 ctx.fillRect(tableX + 10, y, tableWidth - 20, rowHeight);
                 
                 // Row border
-                ctx.strokeStyle = '#4a5568';
+                ctx.strokeStyle = themeColors.border;
                 ctx.lineWidth = 1;
                 ctx.strokeRect(tableX + 10, y, tableWidth - 20, rowHeight);
                 
@@ -4295,7 +4298,7 @@ Example:
                     weekPlayerData.prize ? `£${parseFloat(weekPlayerData.prize).toFixed(2)}` : '-'
                 ];
                 
-                ctx.fillStyle = '#edf2f7';
+                ctx.fillStyle = themeColors.textPrimary;
                 ctx.font = '11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif';
                 
                 colX = tableX + 15;
@@ -4319,19 +4322,19 @@ Example:
             return y + 20;
         }
         
-        function drawResultsSectionSideBySide(ctx, sectionX, sectionWidth, startY) {
+        function drawResultsSectionSideBySide(ctx, sectionX, sectionWidth, startY, themeColors) {
             const sectionHeight = 180;
             
             // Results background
-            ctx.fillStyle = '#2d3748';
+            ctx.fillStyle = themeColors.bgSecondary;
             ctx.fillRect(sectionX, startY, sectionWidth, sectionHeight);
             
-            ctx.strokeStyle = '#4a5568';
+            ctx.strokeStyle = themeColors.border;
             ctx.lineWidth = 2;
             ctx.strokeRect(sectionX, startY, sectionWidth, sectionHeight);
             
             // Results title
-            ctx.fillStyle = '#4299e1';
+            ctx.fillStyle = themeColors.accentPrimary;
             ctx.font = 'bold 18px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif';
             ctx.textAlign = 'left';
             ctx.fillText('🏆 Results', sectionX + 15, startY + 25);
@@ -4355,36 +4358,36 @@ Example:
                 const moneyText = pos.money ? ` (£${parseFloat(pos.money).toFixed(2)})` : '';
                 
                 // Draw emoji, place, and player name all on same line
-                ctx.fillStyle = '#4299e1';
+                ctx.fillStyle = themeColors.accentPrimary;
                 ctx.textAlign = 'left';
                 ctx.fillText(`${pos.emoji} ${pos.place} Place:`, sectionX + 15, y);
                 
                 // Continue on same line with player name
-                ctx.fillStyle = '#edf2f7';
+                ctx.fillStyle = themeColors.textPrimary;
                 ctx.fillText(` ${playerText}`, sectionX + 105, y); // Position after "1st Place:"
                 
                 // Money amount on the far right of same line
                 if (pos.money) {
-                    ctx.fillStyle = '#48bb78';
+                    ctx.fillStyle = themeColors.success;
                     ctx.textAlign = 'right';
                     ctx.fillText(`£${parseFloat(pos.money).toFixed(2)}`, sectionX + sectionWidth - 15, y);
                 }
             });
         }
         
-        function drawRulesSectionSideBySide(ctx, sectionX, sectionWidth, startY) {
+        function drawRulesSectionSideBySide(ctx, sectionX, sectionWidth, startY, themeColors) {
             const sectionHeight = 280;
             
             // Rules background
-            ctx.fillStyle = '#2d3748';
+            ctx.fillStyle = themeColors.bgSecondary;
             ctx.fillRect(sectionX, startY, sectionWidth, sectionHeight);
             
-            ctx.strokeStyle = '#4a5568';
+            ctx.strokeStyle = themeColors.border;
             ctx.lineWidth = 2;
             ctx.strokeRect(sectionX, startY, sectionWidth, sectionHeight);
             
             // Rules title
-            ctx.fillStyle = '#4299e1';
+            ctx.fillStyle = themeColors.accentPrimary;
             ctx.font = 'bold 18px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif';
             ctx.textAlign = 'left';
             ctx.fillText('📋 Swindle Rules', sectionX + 15, startY + 25);
@@ -4426,12 +4429,12 @@ Example:
                     const ruleText = rule.trim();
                     if (ruleText && y < startY + sectionHeight - 30) {
                         // Draw rule number
-                        ctx.fillStyle = '#4299e1';
+                        ctx.fillStyle = themeColors.accentPrimary;
                         ctx.textAlign = 'left';
                         ctx.fillText(`${index + 1}.`, sectionX + 15, y);
                         
                         // Word wrap the rule text
-                        ctx.fillStyle = '#edf2f7';
+                        ctx.fillStyle = themeColors.textPrimary;
                         const maxWidth = sectionWidth - 50;
                         const words = ruleText.split(' ');
                         let line = '';
