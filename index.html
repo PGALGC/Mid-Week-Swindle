@@ -1028,7 +1028,10 @@
             background-color: var(--color-bg-container) !important;
             color: var(--color-text-primary) !important;
         }
-        
+		/* Hide entire Position Wins Analysis section (header + content) */
+		.analytics-section:nth-of-type(2) {
+    	display: none !important;
+		}
         .analytics-table th {
             background-color: var(--color-table-header) !important;
             color: var(--color-text-primary) !important;
@@ -8098,3 +8101,4 @@ Example:
     </script>
 </body>
 </html>
+
